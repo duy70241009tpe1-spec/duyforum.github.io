@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Siêu Ứng Dụng Học Tập - Pro</title>
+    <title>Siêu Ứng Dụng Học Tập - Pro Max</title>
     <style>
         :root {
             --primary-color: #3498db; --secondary-color: #e74c3c; --bg-color: #f0f2f5;
@@ -33,6 +33,28 @@
         label { font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; display: block; color: #555; }
         input { width: 100%; padding: 10px; border: 2px solid #eee; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         
+        /* Giao diện Checkbox mới cho từ loại */
+        .type-checkbox-group { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); 
+            gap: 6px; 
+            background: #fcfcfc; 
+            padding: 12px; 
+            border-radius: 10px; 
+            border: 1px dashed #ccc; 
+        }
+        .type-checkbox-group label { 
+            display: flex; 
+            align-items: center; 
+            gap: 4px; 
+            font-weight: 500; 
+            font-size: 0.7rem; 
+            cursor: pointer; 
+            margin: 0;
+            color: #444;
+        }
+        .type-checkbox-group input { width: auto; cursor: pointer; }
+
         .addBtn { width: 100%; padding: 12px; background-color: var(--primary-color); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         .nav-tabs { display: flex; gap: 15px; margin-bottom: 20px; }
         .tab-btn { padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; color: white; opacity: 0.6; transition: 0.3s; }
@@ -43,23 +65,23 @@
         
         .action-btns { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; align-items: center; }
         .status-btn, .mini-flash-btn { border: none; background: none; cursor: pointer; font-size: 1.1rem; padding: 0; transition: 0.2s; }
-        .status-btn:hover { transform: scale(1.2); }
-
-        .bulk-delete-bar { display: none; background: #fff1f0; border: 1px solid #ffa39e; padding: 10px; border-radius: 10px; margin-bottom: 15px; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box; }
         
-        .topic-tag { align-self: flex-start; font-size: 0.65rem; background: #e8f0fe; color: #1a73e8; padding: 2px 8px; border-radius: 10px; font-weight: bold; margin-bottom: 5px; }
+        .tag-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 5px; }
+        .topic-tag { font-size: 0.65rem; background: #e8f0fe; color: #1a73e8; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+        .type-tag { font-size: 0.65rem; background: #fff1f0; color: #cf1322; padding: 1px 6px; border-radius: 4px; border: 1px solid #ffa39e; font-weight: bold; }
+        
         .ipa-box { color: #2980b9; font-size: 0.95rem; display: flex; align-items: center; gap: 8px; margin: 4px 0; }
         .speak-icon { cursor: pointer; font-size: 1.2rem; filter: grayscale(100%); }
         .speak-icon:hover { filter: grayscale(0%); }
         .cn-char { font-size: 1.8rem; color: #333; margin: 5px 0; font-family: "Microsoft YaHei", sans-serif; }
 
-        /* Flashcard Area */
         .flashcard-area { perspective: 1000px; margin: 20px 0; display: none; position: relative; width: 100%; }
         .flashcard { width: 100%; height: 220px; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; position: relative; }
         .flashcard.flipped { transform: rotateY(180deg); }
         .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 15px; font-size: 1.5rem; font-weight: bold; box-shadow: 0 8px 20px rgba(0,0,0,0.15); padding: 20px; box-sizing: border-box; background: white; border: 3px solid var(--primary-color); text-align: center; }
         .card-back { transform: rotateY(180deg); border-style: dashed; color: #333; }
         .close-flash { position: absolute; top: -15px; right: -5px; background: #e74c3c; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-weight: bold; z-index: 10; }
+        .bulk-delete-bar { display: none; background: #fff1f0; border: 1px solid #ffa39e; padding: 10px; border-radius: 10px; margin-bottom: 15px; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -80,7 +102,6 @@
 
     <div id="english" class="container active">
         <h2 style="color:var(--en-color)">English Studio</h2>
-        
         <div id="en-flash-area" class="flashcard-area">
             <button class="close-flash" onclick="closeFlashcard('en')">✕</button>
             <div class="flashcard" onclick="this.classList.toggle('flipped')">
@@ -89,7 +110,6 @@
             </div>
             <button class="addBtn" id="en-next-btn" style="background:#2d3436; display:none" onclick="startBulkFlashcard('en')">Từ tiếp theo ➔</button>
         </div>
-
         <div id="en-main-ui">
             <div class="search-container">
                 <input type="text" id="en-search" placeholder="🔍 Tìm từ hoặc Topic..." onkeyup="handleSearch('en')" onfocus="showSuggestions('en')">
@@ -100,13 +120,25 @@
                 <button class="filter-btn" onclick="setFilter('en', 'learning')">⏳ Đang học</button>
                 <button class="filter-btn" onclick="setFilter('en', 'learned')">✅ Đã thuộc</button>
             </div>
-
             <button class="addBtn" style="background:#2d3436; margin-bottom:15px;" onclick="startBulkFlashcard('en')">🎴 Ôn tập mục "Đang học"</button>
-
             <div id="en-bulk-bar" class="bulk-delete-bar"><span id="en-count">0 mục</span><button onclick="bulkDelete('en')">Xóa mục chọn</button></div>
-            
             <div id="en-input-fields">
                 <div class="input-group"><label>Từ mới</label><input id="en-w"></div>
+                <div class="input-group">
+                    <label>Từ tính (Word Class)</label>
+                    <div class="type-checkbox-group" id="en-types">
+                        <label><input type="checkbox" value="n"> n</label>
+                        <label><input type="checkbox" value="v"> v</label>
+                        <label><input type="checkbox" value="adj"> adj</label>
+                        <label><input type="checkbox" value="adv"> adv</label>
+                        <label><input type="checkbox" value="prep"> prep</label>
+                        <label><input type="checkbox" value="conj"> conj</label>
+                        <label><input type="checkbox" value="pron"> pron</label>
+                        <label><input type="checkbox" value="det"> det</label>
+                        <label><input type="checkbox" value="idiom"> idiom</label>
+                        <label><input type="checkbox" value="phr"> phr</label>
+                    </div>
+                </div>
                 <div class="input-group"><label>IPA & Nghĩa</label>
                     <div style="display:flex; gap:5px"><input id="en-ipa" placeholder="IPA" style="width:40%"><input id="en-m" placeholder="Nghĩa" style="width:60%"></div>
                 </div>
@@ -119,7 +151,6 @@
 
     <div id="chinese" class="container">
         <h2 style="color:var(--cn-color)">Hán Ngữ Studio</h2>
-        
         <div id="cn-flash-area" class="flashcard-area">
             <button class="close-flash" onclick="closeFlashcard('cn')">✕</button>
             <div class="flashcard" onclick="this.classList.toggle('flipped')">
@@ -128,7 +159,6 @@
             </div>
             <button class="addBtn" id="cn-next-btn" style="background:#2d3436; display:none" onclick="startBulkFlashcard('cn')">Từ tiếp theo ➔</button>
         </div>
-
         <div id="cn-main-ui">
             <div class="search-container">
                 <input type="text" id="cn-search" placeholder="🔍 Tìm Hán tự hoặc Topic..." onkeyup="handleSearch('cn')" onfocus="showSuggestions('cn')">
@@ -139,13 +169,25 @@
                 <button class="filter-btn" onclick="setFilter('cn', 'learning')">⏳ Đang học</button>
                 <button class="filter-btn" onclick="setFilter('cn', 'learned')">✅ Đã thuộc</button>
             </div>
-
             <button class="addBtn" style="background:#2d3436; margin-bottom:15px;" onclick="startBulkFlashcard('cn')">🎴 Ôn tập mục "Đang học"</button>
-
             <div id="cn-bulk-bar" class="bulk-delete-bar"><span id="cn-count">0 mục</span><button onclick="bulkDelete('cn')">Xóa mục chọn</button></div>
-            
             <div id="cn-input-fields">
                 <div class="input-group"><label>Hán tự</label><input id="cn-w"></div>
+                <div class="input-group">
+                    <label>Từ tính (词性)</label>
+                    <div class="type-checkbox-group" id="cn-types">
+                        <label><input type="checkbox" value="Danh"> Danh</label>
+                        <label><input type="checkbox" value="Động"> Động</label>
+                        <label><input type="checkbox" value="Tính"> Tính</label>
+                        <label><input type="checkbox" value="Phó"> Phó</label>
+                        <label><input type="checkbox" value="Lượng"> Lượng</label>
+                        <label><input type="checkbox" value="Đại"> Đại</label>
+                        <label><input type="checkbox" value="Giới"> Giới</label>
+                        <label><input type="checkbox" value="Liên"> Liên</label>
+                        <label><input type="checkbox" value="Trợ"> Trợ</label>
+                        <label><input type="checkbox" value="Số"> Số</label>
+                    </div>
+                </div>
                 <div class="input-group"><label>Pinyin & Nghĩa</label>
                     <div style="display:flex; gap:5px"><input id="cn-p" placeholder="Pinyin" style="width:40%"><input id="cn-m" placeholder="Nghĩa" style="width:60%"></div>
                 </div>
@@ -161,7 +203,6 @@
         let currentFilters = { en: 'all', cn: 'all' };
         let currentFileName = "File_Mac_Dinh";
 
-        // Quản lý Files
         function initFiles() {
             let files = JSON.parse(localStorage.getItem('APP_FILES')) || ["File_Mac_Dinh"];
             localStorage.setItem('APP_FILES', JSON.stringify(files));
@@ -175,7 +216,7 @@
         }
 
         function createNewFile() {
-            let name = prompt("Tên file mới (không dấu, dùng _ thay cách):");
+            let name = prompt("Tên file mới:");
             if (!name) return;
             name = name.trim().replace(/\s+/g, '_');
             let files = JSON.parse(localStorage.getItem('APP_FILES'));
@@ -203,17 +244,52 @@
             updateFileSelector(); renderAll();
         }
 
-        // Lưu và Trạng thái
         function saveWord(lang) {
-            const w = document.getElementById(`${lang}-w`).value, m = document.getElementById(`${lang}-m`).value, t = document.getElementById(`${lang}-t`).value || 'Chung';
+            const w = document.getElementById(`${lang}-w`).value;
+            const m = document.getElementById(`${lang}-m`).value;
+            const t = document.getElementById(`${lang}-t`).value || 'Chung';
             const extra = lang === 'en' ? document.getElementById('en-ipa').value : document.getElementById('cn-p').value;
+            const typeCheckboxes = document.querySelectorAll(`#${lang}-types input:checked`);
+            const types = Array.from(typeCheckboxes).map(cb => cb.value);
+
             if(!w || !m) return alert("Vui lòng điền đủ từ và nghĩa!");
             const key = `${currentFileName}_${lang.toUpperCase()}`;
             const data = JSON.parse(localStorage.getItem(key)) || [];
-            data.push({w, m, t, extra, id: Date.now(), isLearned: false});
+            data.push({w, m, t, extra, types, id: Date.now(), isLearned: false});
             localStorage.setItem(key, JSON.stringify(data));
             renderAll();
-            [`${lang}-w`, `${lang}-m`, `${lang}-t`, lang==='en'?'en-ipa':'cn-p'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById(`${lang}-w`).value = '';
+            document.getElementById(`${lang}-m`).value = '';
+            document.getElementById(`${lang}-t`).value = '';
+            if(lang==='en') document.getElementById('en-ipa').value = ''; else document.getElementById('cn-p').value = '';
+            typeCheckboxes.forEach(cb => cb.checked = false);
+        }
+
+        function renderAll() {
+            ['en', 'cn'].forEach(lang => {
+                const key = `${currentFileName}_${lang.toUpperCase()}`;
+                const listId = lang === 'en' ? 'en-list' : 'cn-display-list';
+                const searchVal = document.getElementById(`${lang}-search`).value.toLowerCase();
+                let data = JSON.parse(localStorage.getItem(key)) || [];
+                if(currentFilters[lang] === 'learning') data = data.filter(i => !i.isLearned);
+                if(currentFilters[lang] === 'learned') data = data.filter(i => i.isLearned);
+                const filtered = data.filter(i => i.w.toLowerCase().includes(searchVal) || i.t.toLowerCase().includes(searchVal)).reverse();
+                document.getElementById(listId).innerHTML = filtered.map(i => {
+                    const typeHtml = (i.types || []).map(t => `<span class="type-tag">${t}</span>`).join('');
+                    return `
+                    <div class="word-item" style="border-left-color:${lang==='en'?'var(--en-color)':'var(--cn-color)'}; opacity: ${i.isLearned ? 0.7 : 1}">
+                        <input type="checkbox" class="select-item-check ${lang}-item-cb" value="${i.id}" onchange="updateBulkBar('${lang}')">
+                        <div class="action-btns">
+                            <button class="mini-flash-btn" onclick="startSingleFlashcard('${lang}', ${i.id})" title="Học từ này">🎴</button>
+                            <button class="status-btn" onclick="toggleStatus('${lang}', ${i.id})">${i.isLearned ? '✅' : '⏳'}</button>
+                        </div>
+                        <div class="tag-row"><span class="topic-tag">${i.t}</span>${typeHtml}</div>
+                        ${lang==='en' ? `<b>${i.w}</b>` : `<div class="cn-char">${i.w}</div>`}
+                        <div class="ipa-box">${i.extra} <span class="speak-icon" onclick="speak('${i.w}', '${lang}')">🔊</span></div>
+                        <div style="margin-top:5px; color:#444; font-weight:500">${i.m}</div>
+                    </div>`}).join('');
+                updateBulkBar(lang);
+            });
         }
 
         function toggleStatus(lang, id) {
@@ -224,7 +300,6 @@
             renderAll();
         }
 
-        // Flashcard Logic
         function startSingleFlashcard(lang, id) {
             const data = JSON.parse(localStorage.getItem(`${currentFileName}_${lang.toUpperCase()}`)) || [];
             const item = data.find(i => i.id === id);
@@ -242,47 +317,20 @@
             document.getElementById(`${lang}-main-ui`).style.display = 'none';
             document.getElementById(`${lang}-flash-area`).style.display = 'block';
             document.getElementById(`${lang}-next-btn`).style.display = isBulk ? 'block' : 'none';
-            
             const card = document.querySelector(`#${lang}-flash-area .flashcard`);
             card.classList.remove('flipped');
-            document.getElementById(`${lang}-front`).innerHTML = `<div style="${lang==='cn'?'font-size:2.2rem':''}">${item.w}</div><small style="color:#666">${item.extra}</small>`;
+            const typeStr = item.types && item.types.length ? `(${item.types.join(', ')})` : '';
+            document.getElementById(`${lang}-front`).innerHTML = `
+                <div style="font-size:0.8rem; color:red; margin-bottom:5px">${typeStr}</div>
+                <div style="${lang==='cn'?'font-size:2.2rem':''}">${item.w}</div>
+                <small style="color:#666">${item.extra}</small>
+            `;
             document.getElementById(`${lang}-back`).innerText = item.m;
         }
 
         function closeFlashcard(lang) {
             document.getElementById(`${lang}-main-ui`).style.display = 'block';
             document.getElementById(`${lang}-flash-area`).style.display = 'none';
-        }
-
-        // Render
-        function renderAll() {
-            ['en', 'cn'].forEach(lang => {
-                const key = `${currentFileName}_${lang.toUpperCase()}`;
-                const listId = lang === 'en' ? 'en-list' : 'cn-display-list';
-                const searchVal = document.getElementById(`${lang}-search`).value.toLowerCase();
-                let data = JSON.parse(localStorage.getItem(key)) || [];
-
-                if(currentFilters[lang] === 'learning') data = data.filter(i => !i.isLearned);
-                if(currentFilters[lang] === 'learned') data = data.filter(i => i.isLearned);
-
-                const filtered = data.filter(i => i.w.toLowerCase().includes(searchVal) || i.t.toLowerCase().includes(searchVal)).reverse();
-
-                document.getElementById(listId).innerHTML = filtered.map(i => `
-                    <div class="word-item" style="border-left-color:${lang==='en'?'var(--en-color)':'var(--cn-color)'}; opacity: ${i.isLearned ? 0.7 : 1}">
-                        <input type="checkbox" class="select-item-check ${lang}-item-cb" value="${i.id}" onchange="updateBulkBar('${lang}')">
-                        <div class="action-btns">
-                            <button class="mini-flash-btn" onclick="startSingleFlashcard('${lang}', ${i.id})" title="Học từ này">🎴</button>
-                            <button class="status-btn" onclick="toggleStatus('${lang}', ${i.id})" title="Đổi trạng thái">
-                                ${i.isLearned ? '✅' : '⏳'}
-                            </button>
-                        </div>
-                        <span class="topic-tag">${i.t}</span>
-                        ${lang==='en' ? `<b>${i.w}</b>` : `<div class="cn-char">${i.w}</div>`}
-                        <div class="ipa-box">${i.extra} <span class="speak-icon" onclick="speak('${i.w}', '${lang}')">🔊</span></div>
-                        <div style="margin-top:5px; color:#444; font-weight:500">${i.m}</div>
-                    </div>`).join('');
-                updateBulkBar(lang);
-            });
         }
 
         function speak(text, lang) {
@@ -314,8 +362,8 @@
         }
         function setFilter(lang, type) {
             currentFilters[lang] = type;
-            const btns = document.querySelectorAll(`#${lang==='en'?'english':'chinese'} .filter-btn`);
-            btns.forEach(b => b.classList.remove('active'));
+            const parent = lang === 'en' ? 'english' : 'chinese';
+            document.querySelectorAll(`#${parent} .filter-btn`).forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
             renderAll();
         }
@@ -334,7 +382,6 @@
             localStorage.setItem(key, JSON.stringify(data));
             renderAll();
         }
-
         window.onload = () => { initFiles(); renderAll(); };
     </script>
 </body>
